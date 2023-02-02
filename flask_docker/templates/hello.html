@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="title">Hello {{ username }}</h3>
+
+
+<form action={{ url_for('render') }} method="post">
+  {% with messages = get_flashed_messages() %}  
+         {% if messages %}  
+               {% for message in messages %}  
+                    <p>{{ message }}</p>  
+               {% endfor %}  
+         {% endif %}  
+  {% endwith %} 
+  <br>
+  <h5 class="subtitle">Create a note</h5><br>
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input type="text" name="title"
+          placeholder="Title" class="form-control input -lg"
+          value="{{ request.form['title'] }}"></input>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="text" name="password"
+          placeholder="If you wish to keep this note private, insert a password" class="form-control input -lg"
+          value="{{ request.form['password'] }}"></input>
+  </div>
+  <div class="form-group">
+    <label for="markdown">Note</label>
+    <textarea name="markdown" placeholder="Your note"
+              class="form-control input -lg">{{ request.form['markdown'] }}</textarea>
+  </div>
+
+  <br>
+  <input type="submit" value="Submit">
+
+{% if notes|length > 0 %}
+<h1> Your notes: </h1>
+<ul>
+{% for note in notes %}
+  {% if note.2 == 1 %}
+    <li><a href="{{ url_for('render') }}/{{note.0}}"> {{ note.1 }}</a></li>
+  {% else %}
+    <li><a href="{{ url_for('hello') }}/{{note.0}}"> {{ note.1 }}</a></li>
+  {% endif %}
+{% endfor %}
+</ul>
+
+{% endif %}
+
+{% endblock %}

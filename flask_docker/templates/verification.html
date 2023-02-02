@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action={{ url_for('verify') }} method="post">
+  <div class="form-group">
+    <label for="pas2">Password</label>
+    <input type="text" name="pas2"
+          placeholder="This note is protected by password" class="form-control input -lg"
+          value="{{ request.form['pas2'] }}"></input>
+  </div>
+  <input type="submit" value="Submit">
+</form>
+{% endblock %}

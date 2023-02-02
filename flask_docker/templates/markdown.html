@@ -1,0 +1,16 @@
+<html>
+<body>
+<h3 class="title"> {{ title }}</h3><br>
+{{ rendered | safe}}
+<br>
+{% if pub == "1" %}
+    <form action={{ url_for('home') }}>
+        <input type="submit" value="Go back" />
+    </form>
+{% else %}
+    <form action={{ url_for('hello') }}>
+        <input type="submit" value="Go back" />
+    </form>
+{% endif %}
+</body>
+</html>

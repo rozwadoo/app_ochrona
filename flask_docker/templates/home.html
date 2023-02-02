@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+{% if notes|length > 0 %}
+<h1> Public notes: </h1>
+<ul>
+{% for note in notes %}
+  <li><a href="{{ url_for('home') }}/{{note.0}}"> {{ note.1 }} by {{ note.2 }}</a></li>
+{% endfor %}
+</ul>
+
+{% endif %}
+
+{% endblock %}
