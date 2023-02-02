@@ -1,6 +1,8 @@
 version: "3.8"
 services:
   web:
+    environment:
+    - PYTHONUNBUFFERED=1
     build: .
     ports:
       - 5000:5000
