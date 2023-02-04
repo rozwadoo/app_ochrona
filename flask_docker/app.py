@@ -103,6 +103,9 @@ def login():
             db.commit()
             if ip != user.ip:
                 print(f"Sent notification about a login from new ip address to {user.email}.")
+                cmd = f"UPDATE user SET ip = ?"
+                sql.execute(cmd, (ip,))
+                db.commit()
             return redirect('/hello')
         else:
             db = sqlite3.connect(DATABASE)
@@ -306,7 +309,7 @@ def signup():
         if username1 is None:
             db = sqlite3.connect(DATABASE)
             sql = db.cursor()
-            cmd = f"INSERT INTO user (username, password, ip, email) VALUES (?, ?, ?, ?)"
+            cmd = f"INSERT INTO user (username, password, ip, email, fails) VALUES (?, ?, ?, ?, 0)"
             sql.execute(cmd, (username, pbkdf2_sha256.hash(password), ip, email))
             db.commit()
             return redirect('/')
@@ -353,10 +356,10 @@ def recover():
         else:
             db = sqlite3.connect(DATABASE)
             sql = db.cursor()
-            cmd = f"UPDATE user SET password = ?"
+            cmd = f"UPDATE user SET password = ? WHERE username = ?"
             password = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(16))
             print(f"Sent new password: {password} to {email1}.")
-            sql.execute(cmd, (pbkdf2_sha256.hash(password),))
+            sql.execute(cmd, (pbkdf2_sha256.hash(password),username1))
             db.commit()
             flash(f'New password has been sent to your email.')
             return redirect('/recover')
