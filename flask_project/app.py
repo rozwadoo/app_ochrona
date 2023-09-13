@@ -143,9 +143,7 @@ def ver(rendered_id):
     name = sql.fetchone()[0]
     if name != username:
         return redirect('/')
-    cmd = f"UPDATE user SET last = ? WHERE username = ? "
-    sql.execute(cmd, (rendered_id,username))
-    db.commit()
+    session['id'] = rendered_id
     return redirect("/verify")
 
 @app.route("/hello", methods=['GET'])
@@ -210,37 +208,35 @@ def verify():
         if ip in ip_ban_list:
             abort(403)
         username = current_user.id
-        db = sqlite3.connect(DATABASE)
-        sql = db.cursor()
-        cmd = "SELECT last FROM user WHERE username = ?"
-        sql.execute(cmd, (username,))
-        try:
-            last = sql.fetchone()[0]
-        except:
-            return "Note not found", 404
-        cmd = "SELECT note FROM notes WHERE id = CAST(? AS int)"
-        sql.execute(cmd, (str(last),))
-        try:
-            note = sql.fetchone()[0]
-        except:
-            return "Note not found", 404
-        pas2 = request.form.get("pas2")
-        if not passwordValidation(pas2):
-            flash('Incorrect password')
-            return redirect('/hello')
-        elif cryptocode.decrypt(note, pas2):
-            pas4 = generate_password(16)
-            pas3 = cryptocode.encrypt(pas2, pas4)
-            session['name'] = pas4
+        id = session.get('id', None)
+        if id is None:
+            return redirect('/') 
+        else:
             db = sqlite3.connect(DATABASE)
             sql = db.cursor()
-            cmd = f"INSERT INTO session (name, password) VALUES (?, ?)"
-            sql.execute(cmd, (username + ip, pas3))
-            db.commit()
-            return redirect(f"/render/{last}")
-        else:
-            flash('Incorrect password')
-            return redirect('/hello')
+            cmd = "SELECT note FROM notes WHERE id = CAST(? AS int)"
+            sql.execute(cmd, (str(id),))
+            try:
+                note = sql.fetchone()[0]
+            except:
+                return "Note not found", 404
+            pas2 = request.form.get("pas2")
+            if not passwordValidation(pas2):
+                flash('Incorrect password')
+                return redirect('/hello')
+            elif cryptocode.decrypt(note, pas2):
+                pas4 = generate_password(16)
+                pas3 = cryptocode.encrypt(pas2, pas4)
+                session['name'] = pas4
+                db = sqlite3.connect(DATABASE)
+                sql = db.cursor()
+                cmd = f"INSERT INTO session (name, password) VALUES (?, ?)"
+                sql.execute(cmd, (username + ip, pas3))
+                db.commit()
+                return redirect(f"/render/{id}")
+            else:
+                flash('Incorrect password')
+                return redirect('/hello')
 
 
 
