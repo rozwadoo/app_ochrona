@@ -1,5 +1,7 @@
 import re
 from math import log2
+import secrets
+import string
 
 def textValidation(text):
     pat = re.compile(r"^[a-zA-Z0-9]*$")
@@ -9,10 +11,13 @@ def textValidation(text):
         return False
 
 def passwordValidation(password):
-    if not textValidation(password):
-        return False
     pat = re.compile(
-        r"(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,16}$")
+        r"^(?=.*[0-9])"            # Contains at least one digit
+        r"(?=.*[A-Z])"            # Contains at least one uppercase letter
+        r"(?=.*[a-z])"            # Contains at least one lowercase letter
+        r"(?=.*[!@#$%^&*()_+\[\]:;,.?~\\/-])" # Contains at least one special character
+        r"[A-Za-z0-9!@#$%^&*()_+\[\]:;,.?~\\/-]{8,16}$" # Consists only of alphanumeric and special characters, and is between 8 to 16 characters
+    )
     if re.fullmatch(pat, password):
         return True
     else:
@@ -40,3 +45,8 @@ def entropy(string):
         if prob > 0.0:
             entropy += prob * log2(prob)
     return -entropy
+
+def generate_password(length=16):
+    alphabet = string.ascii_letters + string.digits + '!@#$%^&*()_+[]:;,.?~\/-'
+    password = ''.join(secrets.choice(alphabet) for i in range(length))
+    return password
