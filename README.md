@@ -2,6 +2,8 @@
 
 W celu uruchomienia aplikacji należy użyć następujących komand:
 
-docker compose build
+w dockerze, ale wówczas nie działa HTTPS
+docker compose up --build
 
-docker compose up
+bez dockera, z HTTPS
+python3 app.py
